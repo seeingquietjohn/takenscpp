@@ -40,6 +40,14 @@ class DelayMatrix {
         return data[i * cols + j];
     }
     
+    // access row via delay vector (row) pointer
+    T* dvec_ptr(std::size_t i) {
+        return data.data() + i * cols;
+    }
+    const T* dvec_ptr(std::size_t i) const {
+        return data.data() + i * cols;
+    }
+    
     std::size_t size() const {
         return data.size();
     }
@@ -54,7 +62,17 @@ DelayMatrix<T> delayEmbed(const std::vector<T>& seq, std::size_t dim, std::size_
     
     // instantiate a delay matrix
     const std::size_t N = seq.size() - (dim - 1) * delay;
-    DelayMatrix<T> X(N, dim); 
+    DelayMatrix<T> X(N, dim);
+    
+    for (std::size_t i = 0; i < N; i++) {
+        T* dvec = X.dvec_ptr(i);
+        std::size_t idx = i;
+        for (std::size_t j = 0; j < dim; j++) {
+            dvec[i] = seq[idx];
+            idx += delay;
+        }
+    }
+    return X; 
 }
 
 }
